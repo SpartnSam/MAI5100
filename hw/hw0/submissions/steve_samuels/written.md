@@ -3,6 +3,7 @@
 **Name: Steve Samuels**
 **Student ID: 1036804**
 
+Q1: I implemented the DFS function with help from Copilot.
 ---
 
 ## Part B: Written Problems
