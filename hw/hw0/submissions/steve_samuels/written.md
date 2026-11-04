@@ -17,6 +17,25 @@ Q3: I implemented the UCS function with help from Copilot.
 A priority queue was used as the data structure. Medium maze had a cost of 68, mediumDottedMaze had a cost of 1, and mediumScaryMaze had a cost of 68719479864. As seen, an extremely low and high cost was given from the two different search agents.
 Autograder gave a 3/3 grading.
 
+Q4: I implemented the A* function with help from Copilot.
+A priority queue was used as the data structure. BigMaze had a cost of 210, 549 search nodes expanded using A* with the manhattanHeuristic.
+**OpenMaze Results:**
+A* and heuristic manhattanHeuristic: Path found with total cost of 54 in 0.0 seconds
+Search nodes expanded: 535
+Pacman emerges victorious! Score: 456
+
+DFS: Path found with total cost of 298 in 0.0 seconds
+Search nodes expanded: 576
+Pacman emerges victorious! Score: 212
+
+BFS: Path found with total cost of 54 in 0.0 seconds
+Search nodes expanded: 682
+Pacman emerges victorious! Score: 456
+
+UCS: Path found with total cost of 54 in 0.0 seconds
+Search nodes expanded: 682
+Pacman emerges victorious! Score: 456
+
 
 ---
 
