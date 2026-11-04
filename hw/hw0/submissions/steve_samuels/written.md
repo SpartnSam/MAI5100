@@ -19,6 +19,7 @@ Autograder gave a 3/3 grading.
 
 Q4: I implemented the A* function with help from Copilot.
 A priority queue was used as the data structure. BigMaze had a cost of 210, 549 search nodes expanded using A* with the manhattanHeuristic.
+
 **OpenMaze Results:**
 A* and heuristic manhattanHeuristic: Path found with total cost of 54 in 0.0 seconds
 Search nodes expanded: 535
@@ -36,7 +37,30 @@ UCS: Path found with total cost of 54 in 0.0 seconds
 Search nodes expanded: 682
 Pacman emerges victorious! Score: 456
 
+Autograder gave a 3/3 grading.
 
+Q5: I implemented the CornersProblem search problem in searchAgents.py with help from Copilot. Each search state stores Pacman's position and a tuple recording which of the four corners have been visited. This avoids including irrelevant game information, while preserving the information needed to recognize the goal. Legal moves have a step cost of 1, so BFS finds a shortest path that visits all four corners.
+
+**tinyCorners Results:**
+BFS found a path with a total cost of 28, matching the expected shortest path.
+Search nodes expanded: 252
+Pacman emerges victorious! Score: 512
+
+**mediumCorners Results:**
+BFS found a path with a total cost of 106.
+Search nodes expanded: 1966
+Pacman emerges victorious! Score: 434
+
+Autograder gave a 6/6 grading.
+
+Q6: I implemented the cornersHeuristic function with help from Copilot. The heuristic estimates the remaining path cost by finding the maze distance from Pacman to the nearest unvisited corner, then adding the minimum spanning tree cost connecting all remaining corners. I used maze distances that respect walls, and cached the distance maps so they could be reused during A* search. This estimate is admissible because any route that visits every remaining corner must at least reach one of them and connect all of them.
+
+**mediumCorners Results:**
+A* with cornersHeuristic found a path with a total cost of 106.
+Search nodes expanded: 196
+Pacman emerges victorious! Score: 434
+
+Autograder gave a 6/6 grading.
 ---
 
 ## Part B: Written Problems

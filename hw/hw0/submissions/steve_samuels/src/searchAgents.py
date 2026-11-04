@@ -296,14 +296,16 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        visitedCorners = tuple(self.startingPosition == corner for corner in self.corners)
+        return (self.startingPosition, visitedCorners)
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        _, visitedCorners = state
+        return all(visitedCorners)
 
     def getSuccessors(self, state: Any):
         """
@@ -326,6 +328,17 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            position, visitedCorners = state
+            x, y = position
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                nextPosition = (nextx, nexty)
+                nextVisitedCorners = tuple(
+                    visited or nextPosition == corner
+                    for visited, corner in zip(visitedCorners, self.corners)
+                )
+                successors.append(((nextPosition, nextVisitedCorners), action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -357,11 +370,47 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
+    corners = problem.corners
+    walls = problem.walls
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    position, visitedCorners = state
+    remaining = [corner for corner, visited in zip(corners, visitedCorners) if not visited]
+    if not remaining:
+        return 0
+
+    if not hasattr(problem, '_cornerDistanceMaps'):
+        distanceMaps = {}
+        for corner in corners:
+            distances = {corner: 0}
+            frontier = util.Queue()
+            frontier.push(corner)
+            while not frontier.isEmpty():
+                x, y = frontier.pop()
+                for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+                    dx, dy = Actions.directionToVector(action)
+                    nextPosition = (int(x + dx), int(y + dy))
+                    if not walls[nextPosition[0]][nextPosition[1]] and nextPosition not in distances:
+                        distances[nextPosition] = distances[(x, y)] + 1
+                        frontier.push(nextPosition)
+            distanceMaps[corner] = distances
+        problem._cornerDistanceMaps = distanceMaps
+
+    distanceMaps = problem._cornerDistanceMaps
+    connectionCost = min(distanceMaps[corner][position] for corner in remaining)
+
+    treeCorners = {remaining[0]}
+    treeCost = 0
+    while len(treeCorners) < len(remaining):
+        distance, nextCorner = min(
+            (distanceMaps[corner][other], other)
+            for corner in treeCorners
+            for other in remaining
+            if other not in treeCorners
+        )
+        treeCost += distance
+        treeCorners.add(nextCorner)
+
+    return connectionCost + treeCost
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
