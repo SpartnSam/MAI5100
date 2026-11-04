@@ -504,7 +504,35 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    foodPositions = foodGrid.asList()
+    if not foodPositions:
+        return 0
+
+    distanceMaps = problem.heuristicInfo.setdefault('mazeDistanceMaps', {})
+
+    def getDistanceMap(start):
+        if start not in distanceMaps:
+            distances = {start: 0}
+            frontier = util.Queue()
+            frontier.push(start)
+            while not frontier.isEmpty():
+                x, y = frontier.pop()
+                for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+                    dx, dy = Actions.directionToVector(action)
+                    nextPosition = (int(x + dx), int(y + dy))
+                    if (not problem.walls[nextPosition[0]][nextPosition[1]]
+                            and nextPosition not in distances):
+                        distances[nextPosition] = distances[(x, y)] + 1
+                        frontier.push(nextPosition)
+            distanceMaps[start] = distances
+        return distanceMaps[start]
+
+    nodes = [position] + [food for food in foodPositions if food != position]
+    return max(
+        getDistanceMap(node)[other]
+        for index, node in enumerate(nodes)
+        for other in nodes[index + 1:]
+    )
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"

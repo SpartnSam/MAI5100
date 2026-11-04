@@ -1,6 +1,7 @@
 # HW0 Written Answers
 
 **Name: Steve Samuels**
+
 **Student ID: 1036804**
 
 Q1: I implemented the DFS function with help from Copilot.
@@ -61,6 +62,20 @@ Search nodes expanded: 196
 Pacman emerges victorious! Score: 434
 
 Autograder gave a 6/6 grading.
+
+Q7: I implemented foodHeuristic with help from Copilot. The heuristic finds the maze distance between Pacman's position and each remaining food dot, and between pairs of remaining food dots. It returns the greatest of those distances. Since any complete route must connect every remaining food location, its length must be at least this greatest pairwise distance. The heuristic is non-negative, returns 0 when no food remains, and uses maze distances that account for walls. Distance maps are cached in `problem.heuristicInfo` to avoid repeating the same breadth-first searches.
+
+**testSearch Results:**
+A* found a path with a total cost of 7 in 0.0 seconds.
+Search nodes expanded: 8
+Pacman emerges victorious! Score: 513
+
+**trickySearch Results:**
+A* found a path with a total cost of 60 in 0.0 seconds.
+Search nodes expanded: 1130
+Pacman emerges victorious! Score: 570
+
+Autograder gave a 8/7 grading, including the extra-credit.
 ---
 
 ## Part B: Written Problems
