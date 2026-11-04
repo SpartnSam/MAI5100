@@ -13,7 +13,9 @@ BFS did gain a lower cost.
 The implementation also ran the 8puzzle search and completed it successfully.
 Autograder gave a 3/3 grading.
 
-Q3: I implemented the BFS function with help from Copilot.
+Q3: I implemented the UCS function with help from Copilot.
+A priority queue was used as the data structure. Medium maze had a cost of 68, mediumDottedMaze had a cost of 1, and mediumScaryMaze had a cost of 68719479864. As seen, an extremely low and high cost was given from the two different search agents.
+Autograder gave a 3/3 grading.
 
 
 ---
