@@ -4,6 +4,18 @@
 **Student ID: 1036804**
 
 Q1: I implemented the DFS function with help from Copilot.
+A stack was used as the data structure, tiny maze had a cost of 10,medium maze had a cost of 130, and big maze 210.
+Autograder gave a 3/3 grading.
+
+Q2: I implemented the BFS function with help from Copilot.
+A queue was used as the data structure, medium maze had a cost of 68, and big maze 210.
+BFS did gain a lower cost.
+The implementation also ran the 8puzzle search and completed it successfully.
+Autograder gave a 3/3 grading.
+
+Q3: I implemented the BFS function with help from Copilot.
+
+
 ---
 
 ## Part B: Written Problems
