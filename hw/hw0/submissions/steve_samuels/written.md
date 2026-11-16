@@ -92,10 +92,29 @@ Autograder gave a 3/3 grading.
 
 ### B1. State spaces and uninformed search
 
-1.
-2.
-3.![alt text](20261116_190731.jpg)
-4.
+1.State space for states 1 to 15
+2.![alt text](Scan_20261116_192718.jpg)
+3.Bidirectional search
+Bidirectional search works very well here.
+Forward branching factor: 2. Each state k has successors 2k and 2k+1.
+Backward branching factor: 1. Each state k > 1 has exactly one predecessor, ⌊k/2⌋. From 11 the backward path is 11 → 5 → 2 → 1.
+Because the backward direction has no branching, it is a single path of length d. The forward search only needs to expand a few levels before meeting it. For goal 11, the two searches meet after a couple of steps, giving the solution 1 → 2 → 5 → 11.
+In general, a single-direction search to depth d costs O(2^d), but the backward search alone costs only O(d) = O(log n) for goal n. You can even skip the forward search entirely and just follow predecessors back to 1. This is a case where the reverse direction is far cheaper than the forward one, so bidirectional search (or just backward search) is dramatically better than plain BFS or IDS.
+4.Solution without search
+Left appends a 0 bit and Right appends a 1 bit, so the actions for goal g are just the binary digits of g after the leading 1.
+function solve(g):
+    actions = []
+    while g > 1:
+        if g is odd: add "Right" to actions
+        else:        add "Left" to actions
+        g = g / 2   (integer division)
+    return actions reversed
+
+Example: g = 11 = 1011 in binary, so the actions are Left, Right, Right (1 → 2 → 5 → 11).
+
+This takes O(log g) time with no search at all.
+
+What this says about problem formulation: A good formulation can matter more than the search algorithm. BFS or IDS costs O(2^d), backward search costs O(d), and using the binary structure gives the answer directly. Looking for structure in the problem first (like a unique predecessor or a numeric pattern) can remove the need for search entirely.
 
 ### B2. Problem formulation and heuristics
 
