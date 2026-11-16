@@ -40,7 +40,7 @@ Pacman emerges victorious! Score: 456
 
 Autograder gave a 3/3 grading.
 
-Q5: I implemented the CornersProblem search problem in searchAgents.py with help from Copilot. Each search state stores Pacman's position and a tuple recording which of the four corners have been visited. This avoids including irrelevant game information, while preserving the information needed to recognize the goal. Legal moves have a step cost of 1, so BFS finds a shortest path that visits all four corners.
+Q5: I implemented the `CornersProblem` search problem in searchAgents.py with help from Copilot. Each search state stores Pacman's position and a tuple recording which of the four corners have been visited. This avoids including irrelevant game information, while preserving the information needed to recognize the goal. Legal moves have a step cost of 1, so BFS finds a shortest path that visits all four corners.
 
 **tinyCorners Results:**
 BFS found a path with a total cost of 28, matching the expected shortest path.
@@ -54,7 +54,7 @@ Pacman emerges victorious! Score: 434
 
 Autograder gave a 6/6 grading.
 
-Q6: I implemented the cornersHeuristic function with help from Copilot. The heuristic estimates the remaining path cost by finding the maze distance from Pacman to the nearest unvisited corner, then adding the minimum spanning tree cost connecting all remaining corners. I used maze distances that respect walls, and cached the distance maps so they could be reused during A* search. This estimate is admissible because any route that visits every remaining corner must at least reach one of them and connect all of them.
+Q6: I implemented the `cornersHeuristic` function with help from Copilot. The heuristic estimates the remaining path cost by finding the maze distance from Pacman to the nearest unvisited corner, then adding the minimum spanning tree cost connecting all remaining corners. I used maze distances that respect walls, and cached the distance maps so they could be reused during A* search. This estimate is admissible because any route that visits every remaining corner must at least reach one of them and connect all of them.
 
 **mediumCorners Results:**
 A* with cornersHeuristic found a path with a total cost of 106.
@@ -63,7 +63,7 @@ Pacman emerges victorious! Score: 434
 
 Autograder gave a 6/6 grading.
 
-Q7: I implemented the foodHeuristic function with help from Copilot. The heuristic finds the maze distance between Pacman's position and each remaining food dot, and between pairs of remaining food dots. It returns the greatest of those distances. Since any complete route must connect every remaining food location, its length must be at least this greatest pairwise distance. The heuristic is non-negative, returns 0 when no food remains, and uses maze distances that account for walls. Distance maps are cached in `problem.heuristicInfo` to avoid repeating the same breadth-first searches.
+Q7: I implemented the `foodHeuristic` function with help from Copilot. The heuristic finds the maze distance between Pacman's position and each remaining food dot, and between pairs of remaining food dots. It returns the greatest of those distances. Since any complete route must connect every remaining food location, its length must be at least this greatest pairwise distance. The heuristic is non-negative, returns 0 when no food remains, and uses maze distances that account for walls. Distance maps are cached in `problem.heuristicInfo` to avoid repeating the same breadth-first searches.
 
 **testSearch Results:**
 A* found a path with a total cost of 7 in 0.0 seconds.
@@ -77,7 +77,7 @@ Pacman emerges victorious! Score: 570
 
 Autograder gave a 8/7 grading, including the extra-credit.
 
-Q8: I implemented findPathToClosestDot and AnyFoodSearchProblem.isGoalState functions with help from Copilot. The goal test returns true when Pacman's current position contains food. `findPathToClosestDot` runs BFS on this problem, which returns a shortest path to any remaining dot. The agent repeats this process after eating each dot.
+Q8: I implemented `findPathToClosestDot` and `AnyFoodSearchProblem.isGoalState` functions with help from Copilot. The goal test returns true when Pacman's current position contains food. `findPathToClosestDot` runs BFS on this problem, which returns a shortest path to any remaining dot. The agent repeats this process after eating each dot.
 
 This greedy strategy is not guaranteed to find the shortest path for eating all the dots. Each BFS finds the nearest dot from Pacman's current position, but it does not consider how the choice affects the distance to the dots left afterward. For example, consider a small weighted maze graph with start S and food dots A, B, C, and D. If the shortest-path distances are S-to-(A,B,C,D) = (19, 19, 15, 20), A-to-(B,C,D) = (22, 25, 29), B-to-(C,D) = (13, 21), and C-to-D = 20, greedy chooses C, then B, D, and A, for a total of 78. The order A, B, C, D costs 19 + 22 + 13 + 20 = 74. Thus, repeatedly choosing the nearest dot can produce a longer total route.
 
@@ -94,7 +94,7 @@ Autograder gave a 3/3 grading.
 
 1.
 2.
-3.
+3.![alt text](20261116_190731.jpg)
 4.
 
 ### B2. Problem formulation and heuristics
