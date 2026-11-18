@@ -95,12 +95,16 @@ Autograder gave a 3/3 grading.
 1.State space for states 1 to 15
 2.![alt text](Scan_20261116_192718.jpg)
 3.Bidirectional search
+
 Bidirectional search works very well here.
 Forward branching factor: 2. Each state k has successors 2k and 2k+1.
 Backward branching factor: 1. Each state k > 1 has exactly one predecessor, ⌊k/2⌋. From 11 the backward path is 11 → 5 → 2 → 1.
+
 Because the backward direction has no branching, it is a single path of length d. The forward search only needs to expand a few levels before meeting it. For goal 11, the two searches meet after a couple of steps, giving the solution 1 → 2 → 5 → 11.
+
 In general, a single-direction search to depth d costs O(2^d), but the backward search alone costs only O(d) = O(log n) for goal n. You can even skip the forward search entirely and just follow predecessors back to 1. This is a case where the reverse direction is far cheaper than the forward one, so bidirectional search (or just backward search) is dramatically better than plain BFS or IDS.
 4.Solution without search
+
 Left appends a 0 bit and Right appends a 1 bit, so the actions for goal g are just the binary digits of g after the leading 1.
 function solve(g):
     actions = []
@@ -118,10 +122,41 @@ What this says about problem formulation: A good formulation can matter more tha
 
 ### B2. Problem formulation and heuristics
 
-1.
-2.
-3.
-4.
+1.State space size
+
+Vehicles are distinguishable (order matters) and no two share a square. Vehicle 1 has n² choices, vehicle 2 has n² − 1, and so on:
+
+|S| = n²(n² − 1)…(n² − n + 1) = (n²)! / (n² − n)!
+
+(roughly (n²)ⁿ as an upper bound)
+
+2.Branching factor
+
+Each vehicle has 5 choices (up, down, left, right, stay), and all vehicles move at the same time. So:
+
+b ≈ 5ⁿ joint actions.
+
+This is an upper bound, since some actions are illegal (off-grid or collisions). Hops add a few extra options per vehicle (a hop is a 2-square move over a stationary neighbour), so the strict bound is ≤ 9ⁿ, but 5ⁿ is the usual answer.
+
+3.Heuristic for vehicle i at (x, y)
+
+The goal is (n − i + 1, n). The Manhattan distance is
+
+dᵢ = |x − (n − i + 1)| + |n − y|
+
+A hop moves a vehicle 2 squares in one step, so dᵢ can overestimate in the full problem. To be safe:
+
+hᵢ = (|x − (n − i + 1)| + |n − y|) / 2
+
+This is admissible because a vehicle covers at most 2 squares of distance per step. It’s nontrivial since it’s > 0 away from the goal. (If you ignore hops, plain Manhattan distance works.)
+
+4. Which are admissible for the whole problem?
+
+(a) ∑ hᵢ: not admissible. All vehicles move simultaneously in one step, so one step can reduce every hᵢ at once. The sum counts the same time step n times and overestimates. Example: n vehicles each needing 1 move takes 1 step, but the sum is n·hᵢ.
+
+(b) maxᵢ hᵢ: admissible. Every vehicle must reach its goal, so the total time is at least the time the slowest vehicle needs on its own. Ignoring the other vehicles only removes constraints, so this is a lower bound on the true cost. It’s also the tightest of the three.
+
+(c) minᵢ hᵢ: admissible, but weak. minᵢ hᵢ ≤ maxᵢ hᵢ ≤ true cost, so it never overestimates. It’s less informative, though, because it only reflects the vehicle closest to its goal (and is often 0).
 
 ### B3. Proofs about heuristics
 
