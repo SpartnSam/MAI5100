@@ -160,9 +160,43 @@ This is admissible because a vehicle covers at most 2 squares of distance per st
 
 ### B3. Proofs about heuristics
 
-1.
-2.
-3.
+1.Consistency ⇒ admissibility
+
+Definitions: h is consistent if h(n) ≤ c(n,n’) + h(n’) for every node n and successor n’. h is admissible if h(n) ≤ h*(n), the true cost to the goal.
+
+Proof (induction on the number of steps k from n to the goal along an optimal path):
+
+Base case (k = 0): n is the goal, so h(n) = 0 = h*(n). ✓
+Inductive step: suppose it holds for every node k−1 steps from the goal. Take n whose optimal path has k steps, with first successor n’ on that path. Then h*(n) = c(n,n’) + h*(n’).
+Consistency: h(n) ≤ c(n,n’) + h(n’)
+Induction hypothesis: h(n’) ≤ h*(n’)
+So h(n) ≤ c(n,n’) + h*(n’) = h*(n). ✓
+
+(Equivalent view: add up the consistency inequality along the optimal path n = n₀, n₁, …, n_k = goal. The h terms cancel (telescoping), leaving h(n) ≤ total path cost + h(goal) = h*(n).)
+
+2.Max is admissible: for every n, h₁(n) ≤ h*(n) and h₂(n) ≤ h*(n). So max(h₁(n), h₂(n)) ≤ h*(n). ✓
+
+Sum is NOT admissible in general. Counterexample: let h*(n) = 10 and h₁(n) = h₂(n) = 8. Both are admissible (8 ≤ 10), but h₁ + h₂ = 16 > 10. ✗
+
+(Concrete version: a path graph S → G with cost 1. Take h₁(S) = h₂(S) = 1. Each is admissible, but the sum is 2 > h*(S) = 1.)
+
+3.Weighted A*
+
+Claim: the returned solution cost C ≤ w·C*, where C* is the optimal cost.
+
+Proof:
+
+a.Let n be a node on an optimal path that is still on the frontier when weighted A* is about to pick the goal G. (One always exists: the optimal path starts at the root and ends at the goal, so some node on it is on the frontier.)
+
+b.Because h is admissible, g(n) + h(n) ≤ C*, and g(n) ≤ C* too (n is on the optimal path; with consistent h, g(n) is optimal for n).
+
+c.Then f(n) = g(n) + w·h(n) ≤ w·(g(n) + h(n)) ≤ w·C*. (The first step uses w ≥ 1, so g(n) ≤ w·g(n).)
+
+d.G is chosen before n, so f(G) ≤ f(n). Also h(G) = 0, so f(G) = g(G) = C.
+
+e.Therefore C = f(G) ≤ f(n) ≤ w·C*.
+
+Why accept a suboptimal answer? Speed and memory. A larger w makes the search more greedy, so it expands far fewer nodes. You get a solution that is guaranteed to be within a factor w of optimal, much faster. This is useful when the problem is huge, time is limited, or “good enough” is fine (e.g. robot path planning).
 
 ### B4. Hand trace: Bartica to Ituni
 
