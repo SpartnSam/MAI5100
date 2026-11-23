@@ -199,38 +199,40 @@ e.Therefore C = f(G) ≤ f(n) ≤ w·C*.
 Why accept a suboptimal answer? Speed and memory. A larger w makes the search more greedy, so it expands far fewer nodes. You get a solution that is guaranteed to be within a factor w of optimal, much faster. This is useful when the problem is huge, time is limited, or “good enough” is fine (e.g. robot path planning).
 
 ### B4. Hand trace: Bartica to Ituni
+Straight-line distances to Ituni (km) used for A*
 
-Straight-line distances to Ituni (km) used for A*:
+| Town | h (km) |
+|:---|---:|
+| Ituni | 0.0 |
+| Kwakwani | 36.7 |
+| Linden | 53.5 |
+| Mahdia | 102.6 |
+| Bartica | 105.1 |
+| Kurupukari | 106.7 |
+| Timehri | 108.8 |
+| Soesdyke | 112.5 |
+| New Amsterdam | 113.8 |
+| Rosignol | 114.6 |
+| Corriverton | 130.2 |
+| Diamond | 131.6 |
+| Mahaica | 133.1 |
+| Ogle | 138.3 |
+| Georgetown | 141.8 |
+| Vreed en Hoop | 142.2 |
+| Parika | 148.7 |
+| Anna Regina | 193.9 |
+| Annai | 200.5 |
+| Charity | 210.6 |
+| Lethem | 294.4 |
 
-h table (km to Ituni):
-  Ituni             0.0
-  Kwakwani         36.7
-  Linden           53.5
-  Mahdia          102.6
-  Bartica         105.1
-  Kurupukari      106.7
-  Timehri         108.8
-  Soesdyke        112.5
-  New Amsterdam   113.8
-  Rosignol        114.6
-  Corriverton     130.2
-  Diamond         131.6
-  Mahaica         133.1
-  Ogle            138.3
-  Georgetown      141.8
-  Vreed en Hoop   142.2
-  Parika          148.7
-  Anna Regina     193.9
-  Annai           200.5
-  Charity         210.6
-  Lethem          294.4
+## BFS (expansion order, fringe at each step)
 
-**BFS** (expansion order, fringe at each step):
-=== BFS ===
- 1. expand Bartica        fringe: ['Mahdia', 'Parika']
- 2. expand Mahdia         fringe: ['Parika', 'Linden']
- 3. expand Parika         fringe: ['Linden', 'Anna Regina', 'Vreed en Hoop']
- 4. expand Linden         fringe: ['Anna Regina', 'Vreed en Hoop', 'Ituni']   <- Ituni generated, stop
+| Step | Expand | Fringe after expanding |
+|:---:|:---|:---|
+| 1 | Bartica | Mahdia, Parika |
+| 2 | Mahdia | Parika, Linden |
+| 3 | Parika | Linden, Anna Regina, Vreed en Hoop |
+| 4 | Linden | Anna Regina, Vreed en Hoop, Ituni (generated, so BFS stops) |
 
 **UCS** (expansion order, fringe and g at each step):
 === UCS ===
@@ -292,19 +294,13 @@ h table (km to Ituni):
       fringe: Ituni(g=456.8, h=0.0, f=456.8), Anna Regina(g=293.3, h=193.9, f=487.2), Rosignol(g=387.2, h=114.6, f=501.8), Kwakwani(g=498.2, h=36.7, f=534.9), Kurupukari(g=617.8, h=106.7, f=724.5)
 12. expand Ituni (g=456.8)  <- GOAL, stop
 
-| Algorithm | Route | Cost (km) | Optimal? |
-|---|---|---|---|
-| BFS | | | |
-| UCS | | | |
-| A* | | | |
+| Algorithm | Route | Cost (km) | Optimal? | Nodes expanded |
+|:---|:---|---:|:---:|---:|
+| BFS | Bartica → Mahdia → Linden → Ituni | 527.1 | No | 4 |
+| UCS | Bartica → Parika → Vreed en Hoop → Georgetown → Diamond → Soesdyke → Linden → Ituni | 456.8 | Yes | 15 |
+| A* | Bartica → Parika → Vreed en Hoop → Georgetown → Diamond → Soesdyke → Linden → Ituni | 456.8 | Yes | 11 |
 
-=== SUMMARY ===
-Algo     Cost  Optimal Expanded Route
-BFS     527.1  False   4        Bartica -> Mahdia -> Linden -> Ituni
-UCS     456.8  True    15       Bartica -> Parika -> Vreed en Hoop -> Georgetown -> Diamond -> Soesdyke -> Linden -> Ituni
-A*      456.8  True    11       Bartica -> Parika -> Vreed en Hoop -> Georgetown -> Diamond -> Soesdyke -> Linden -> Ituni
-
-Conclusion
+Conclusion: 
 The Mahdia route (Bartica → Mahdia → Linden → Ituni, 527.1 km) was not optimal because it costs more kilometres, even though it has fewer roads. Reaching Linden via Mahdia costs 265.8 + 195.5 = 461.3 km, while going via Parika, Vreed en Hoop, Georgetown, Diamond and Soesdyke costs only 391.0 km, which is 70.3 km less. Both routes then use the same 65.8 km Linden → Ituni road, so the whole difference comes from how they reach Linden (456.8 km in total for the Parika route). BFS picks the Mahdia route because it counts roads, not distance, and 3 roads beats 7. UCS and A* add up the kilometres, so they replace Linden’s cost of 461.3 with 391.0 when Soesdyke is expanded, and they return the cheaper route. The Parika route is also faster in time (about 8.7 hours versus 13.6 hours), so it is better whether you measure in km or hours.
 
 Why A* expanded fewer (or not fewer) nodes than UCS:
