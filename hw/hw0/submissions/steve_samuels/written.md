@@ -202,15 +202,95 @@ Why accept a suboptimal answer? Speed and memory. A larger w makes the search mo
 
 Straight-line distances to Ituni (km) used for A*:
 
-| Town | h (km) |
-|---|---|
-| | |
+h table (km to Ituni):
+  Ituni             0.0
+  Kwakwani         36.7
+  Linden           53.5
+  Mahdia          102.6
+  Bartica         105.1
+  Kurupukari      106.7
+  Timehri         108.8
+  Soesdyke        112.5
+  New Amsterdam   113.8
+  Rosignol        114.6
+  Corriverton     130.2
+  Diamond         131.6
+  Mahaica         133.1
+  Ogle            138.3
+  Georgetown      141.8
+  Vreed en Hoop   142.2
+  Parika          148.7
+  Anna Regina     193.9
+  Annai           200.5
+  Charity         210.6
+  Lethem          294.4
 
 **BFS** (expansion order, fringe at each step):
+=== BFS ===
+ 1. expand Bartica        fringe: ['Mahdia', 'Parika']
+ 2. expand Mahdia         fringe: ['Parika', 'Linden']
+ 3. expand Parika         fringe: ['Linden', 'Anna Regina', 'Vreed en Hoop']
+ 4. expand Linden         fringe: ['Anna Regina', 'Vreed en Hoop', 'Ituni']   <- Ituni generated, stop
 
 **UCS** (expansion order, fringe and g at each step):
+=== UCS ===
+ 1. expand Bartica (g=0.0)
+      fringe: Parika(235.2), Mahdia(265.8)
+ 2. expand Parika (g=235.2)
+      fringe: Mahdia(265.8), Vreed en Hoop(266.1), Anna Regina(293.3)
+ 3. expand Mahdia (g=265.8)
+      fringe: Vreed en Hoop(266.1), Anna Regina(293.3), Linden(461.3)
+ 4. expand Vreed en Hoop (g=266.1)
+      fringe: Georgetown(281.6), Anna Regina(293.3), Linden(461.3)
+ 5. expand Georgetown (g=281.6)
+      fringe: Ogle(288.6), Anna Regina(293.3), Diamond(294.6), Timehri(325.4), Linden(461.3)
+ 6. expand Ogle (g=288.6)
+      fringe: Anna Regina(293.3), Diamond(294.6), Mahaica(321.6), Timehri(325.4), Linden(461.3)
+ 7. expand Anna Regina (g=293.3)
+      fringe: Diamond(294.6), Charity(318.5), Mahaica(321.6), Timehri(325.4), Linden(461.3)
+ 8. expand Diamond (g=294.6)
+      fringe: Soesdyke(315.7), Charity(318.5), Mahaica(321.6), Timehri(325.4), Linden(461.3)
+ 9. expand Soesdyke (g=315.7)
+      fringe: Charity(318.5), Mahaica(321.6), Timehri(324.2), Linden(391.0)
+10. expand Charity (g=318.5)
+      fringe: Mahaica(321.6), Timehri(324.2), Linden(391.0)
+11. expand Mahaica (g=321.6)
+      fringe: Timehri(324.2), Rosignol(387.2), Linden(391.0)
+12. expand Timehri (g=324.2)
+      fringe: Rosignol(387.2), Linden(391.0)
+13. expand Rosignol (g=387.2)
+      fringe: Linden(391.0), New Amsterdam(399.7)
+14. expand Linden (g=391.0)
+      fringe: New Amsterdam(399.7), Ituni(456.8), Kwakwani(498.2), Kurupukari(617.8)
+15. expand New Amsterdam (g=399.7)
+      fringe: Ituni(456.8), Corriverton(473.9), Kwakwani(498.2), Kurupukari(617.8)
+16. expand Ituni (g=456.8)  <- GOAL, stop
 
 **A\*** (expansion order, fringe with g, h, f at each step):
+=== A* ===
+ 1. expand Bartica (g=0.0, h=105.1, f=105.1)
+      fringe: Mahdia(g=265.8, h=102.6, f=368.4), Parika(g=235.2, h=148.7, f=383.9)
+ 2. expand Mahdia (g=265.8, h=102.6, f=368.4)
+      fringe: Parika(g=235.2, h=148.7, f=383.9), Linden(g=461.3, h=53.5, f=514.8)
+ 3. expand Parika (g=235.2, h=148.7, f=383.9)
+      fringe: Vreed en Hoop(g=266.1, h=142.2, f=408.3), Anna Regina(g=293.3, h=193.9, f=487.2), Linden(g=461.3, h=53.5, f=514.8)
+ 4. expand Vreed en Hoop (g=266.1, h=142.2, f=408.3)
+      fringe: Georgetown(g=281.6, h=141.8, f=423.4), Anna Regina(g=293.3, h=193.9, f=487.2), Linden(g=461.3, h=53.5, f=514.8)
+ 5. expand Georgetown (g=281.6, h=141.8, f=423.4)
+      fringe: Diamond(g=294.6, h=131.6, f=426.2), Ogle(g=288.6, h=138.3, f=426.9), Timehri(g=325.4, h=108.8, f=434.2), Anna Regina(g=293.3, h=193.9, f=487.2), Linden(g=461.3, h=53.5, f=514.8)
+ 6. expand Diamond (g=294.6, h=131.6, f=426.2)
+      fringe: Ogle(g=288.6, h=138.3, f=426.9), Soesdyke(g=315.7, h=112.5, f=428.2), Timehri(g=325.4, h=108.8, f=434.2), Anna Regina(g=293.3, h=193.9, f=487.2), Linden(g=461.3, h=53.5, f=514.8)
+ 7. expand Ogle (g=288.6, h=138.3, f=426.9)
+      fringe: Soesdyke(g=315.7, h=112.5, f=428.2), Timehri(g=325.4, h=108.8, f=434.2), Mahaica(g=321.6, h=133.1, f=454.7), Anna Regina(g=293.3, h=193.9, f=487.2), Linden(g=461.3, h=53.5, f=514.8)
+ 8. expand Soesdyke (g=315.7, h=112.5, f=428.2)
+      fringe: Timehri(g=324.2, h=108.8, f=433.0), Linden(g=391.0, h=53.5, f=444.5), Mahaica(g=321.6, h=133.1, f=454.7), Anna Regina(g=293.3, h=193.9, f=487.2)
+ 9. expand Timehri (g=324.2, h=108.8, f=433.0)
+      fringe: Linden(g=391.0, h=53.5, f=444.5), Mahaica(g=321.6, h=133.1, f=454.7), Anna Regina(g=293.3, h=193.9, f=487.2)
+10. expand Linden (g=391.0, h=53.5, f=444.5)
+      fringe: Mahaica(g=321.6, h=133.1, f=454.7), Ituni(g=456.8, h=0.0, f=456.8), Anna Regina(g=293.3, h=193.9, f=487.2), Kwakwani(g=498.2, h=36.7, f=534.9), Kurupukari(g=617.8, h=106.7, f=724.5)
+11. expand Mahaica (g=321.6, h=133.1, f=454.7)
+      fringe: Ituni(g=456.8, h=0.0, f=456.8), Anna Regina(g=293.3, h=193.9, f=487.2), Rosignol(g=387.2, h=114.6, f=501.8), Kwakwani(g=498.2, h=36.7, f=534.9), Kurupukari(g=617.8, h=106.7, f=724.5)
+12. expand Ituni (g=456.8)  <- GOAL, stop
 
 | Algorithm | Route | Cost (km) | Optimal? |
 |---|---|---|---|
@@ -218,7 +298,31 @@ Straight-line distances to Ituni (km) used for A*:
 | UCS | | | |
 | A* | | | |
 
+=== SUMMARY ===
+Algo     Cost  Optimal Expanded Route
+BFS     527.1  False   4        Bartica -> Mahdia -> Linden -> Ituni
+UCS     456.8  True    15       Bartica -> Parika -> Vreed en Hoop -> Georgetown -> Diamond -> Soesdyke -> Linden -> Ituni
+A*      456.8  True    11       Bartica -> Parika -> Vreed en Hoop -> Georgetown -> Diamond -> Soesdyke -> Linden -> Ituni
+
+Conclusion
+The Mahdia route (Bartica → Mahdia → Linden → Ituni, 527.1 km) was not optimal because it costs more kilometres, even though it has fewer roads. Reaching Linden via Mahdia costs 265.8 + 195.5 = 461.3 km, while going via Parika, Vreed en Hoop, Georgetown, Diamond and Soesdyke costs only 391.0 km, which is 70.3 km less. Both routes then use the same 65.8 km Linden → Ituni road, so the whole difference comes from how they reach Linden (456.8 km in total for the Parika route). BFS picks the Mahdia route because it counts roads, not distance, and 3 roads beats 7. UCS and A* add up the kilometres, so they replace Linden’s cost of 461.3 with 391.0 when Soesdyke is expanded, and they return the cheaper route. The Parika route is also faster in time (about 8.7 hours versus 13.6 hours), so it is better whether you measure in km or hours.
+
 Why A* expanded fewer (or not fewer) nodes than UCS:
+
+A* expanded fewer nodes than UCS (11 versus 15) because it uses the straight-line distance to Ituni to push unpromising towns to the back of the fringe, while UCS has no idea where Ituni is. Both found the same optimal route of 456.8 km.
+
+UCS ranks the fringe by g(n) alone, so it expands any town that is cheap to reach from Bartica, even if it lies in the wrong direction. It has to expand every node with g < 456.8 before Ituni gets to the front. A* ranks the fringe by f(n) = g(n) + h(n), so a town that is cheap to reach but far from Ituni gets a large f and just sits in the fringe. Here is what that did to four towns:
+
+| Node | UCS | A* |
+|:---|:---|:---|
+| Anna Regina | Expanded at step 7 (g = 293.3) | Stays in the fringe with f = 293.3 + 193.9 = 487.2 and is never expanded |
+| Charity | Expanded at step 10 (g = 318.5) | Never generated, since its parent Anna Regina is never expanded |
+| Rosignol | Expanded at step 13 (g = 387.2) | Enters the fringe with f = 387.2 + 114.6 = 501.8 and is never expanded |
+| New Amsterdam | Expanded at step 15 (g = 399.7) | Never generated, since its parent Rosignol is never expanded |
+
+A* puts Ituni into the fringe at step 10 with f = 456.8. Once Mahaica is expanded at step 11 (f = 454.7), Ituni has the lowest f in the fringe, because every other entry has f ≥ 487.2. A* picks it at step 12 and stops. Since h never overestimates the true remaining cost, no cheaper route can exist, so the answer is optimal.
+
+The saving is only 4 nodes because straight-line distance can't see the road layout. Ogle, Timehri and Mahaica still have f below 456.8, so A* expands them even though they aren't on the final route. Also, the way out of Bartica is forced through one corridor (Parika → Georgetown → Soesdyke → Linden), so there isn't much for h to prune.
 
 ---
 
