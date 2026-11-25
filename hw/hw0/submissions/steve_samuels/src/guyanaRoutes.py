@@ -85,12 +85,14 @@ class GuyanaRouteProblem(search.SearchProblem):
         self._expanded = 0  # do not change; used for analysis and grading
 
     def getStartState(self):
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.start
 
     def isGoalState(self, state):
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return state == self.goal
+
+    def _stepCost(self, km, hours):
+        # helper: pick the cost according to costMode
+        return km if self.costMode == "km" else hours
 
     def getSuccessors(self, state):
         """
@@ -99,17 +101,35 @@ class GuyanaRouteProblem(search.SearchProblem):
         cost depends on self.costMode.
         """
         self._expanded += 1  # do not change
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        successors = []
+        for neighbor, km, hours, is_ferry in self.roadMap.roads[state]:
+            # (successor state, action, step cost); the action is the town's name
+            successors.append((neighbor, neighbor, self._stepCost(km, hours)))
+        return successors
 
     def getCostOfActions(self, actions):
         """
         Total cost of following `actions` (a list of town names) from the start.
         Return 999999 if any step is not a road.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        current, total = self.start, 0.0
+        for nextTown in actions:
+            costs = [self._stepCost(km, hours)
+                     for neighbor, km, hours, is_ferry in self.roadMap.roads.get(current, [])
+                     if neighbor == nextTown]
+            if not costs:           # no road from current to nextTown
+                return 999999
+            total += min(costs)
+            current = nextTown
+        return total
 
+def _maxSpeedKmh(roadMap):
+    """Fastest average speed (km/h) of any road in the network, computed once."""
+    if not hasattr(roadMap, "_maxSpeed"):
+        roadMap._maxSpeed = max(km / hours
+                                for roads in roadMap.roads.values()
+                                for _, km, hours, _ in roads)
+    return roadMap._maxSpeed
 
 def straightLineHeuristic(state, problem):
     """
@@ -121,9 +141,11 @@ def straightLineHeuristic(state, problem):
     Think about the fastest any vehicle could possibly travel in this network,
     and justify your choice in your written answers.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    coords = problem.roadMap.coords
+    km = haversineKm(coords[state], coords[problem.goal])
+    if problem.costMode == "km":
+        return km
+    return km / _maxSpeedKmh(problem.roadMap)
 
 def runExperiment(start, goal, costMode="km"):
     """
@@ -155,8 +177,21 @@ def greedySearch(problem, heuristic):
     Greedy best-first search: always expand the node with the lowest h(n).
     Graph search (keep a set of expanded states).
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    frontier = util.PriorityQueue()
+    start = problem.getStartState()
+    frontier.push((start, []), heuristic(start, problem))   # priority = h only
+    expanded = set()
+    while not frontier.isEmpty():
+        state, path = frontier.pop()
+        if state in expanded:           # stale duplicate in the queue
+            continue
+        if problem.isGoalState(state):
+            return path
+        expanded.add(state)
+        for successor, action, stepCost in problem.getSuccessors(state):
+            if successor not in expanded:
+                frontier.push((successor, path + [action]), heuristic(successor, problem))
+    return []                            # no route found
 
 
 if __name__ == "__main__":

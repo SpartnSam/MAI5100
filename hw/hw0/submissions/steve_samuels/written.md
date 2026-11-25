@@ -300,10 +300,10 @@ Straight-line distances to Ituni (km) used for A*
 | UCS | Bartica → Parika → Vreed en Hoop → Georgetown → Diamond → Soesdyke → Linden → Ituni | 456.8 | Yes | 15 |
 | A* | Bartica → Parika → Vreed en Hoop → Georgetown → Diamond → Soesdyke → Linden → Ituni | 456.8 | Yes | 11 |
 
-Conclusion: 
+**Conclusion:** 
 The Mahdia route (Bartica → Mahdia → Linden → Ituni, 527.1 km) was not optimal because it costs more kilometres, even though it has fewer roads. Reaching Linden via Mahdia costs 265.8 + 195.5 = 461.3 km, while going via Parika, Vreed en Hoop, Georgetown, Diamond and Soesdyke costs only 391.0 km, which is 70.3 km less. Both routes then use the same 65.8 km Linden → Ituni road, so the whole difference comes from how they reach Linden (456.8 km in total for the Parika route). BFS picks the Mahdia route because it counts roads, not distance, and 3 roads beats 7. UCS and A* add up the kilometres, so they replace Linden’s cost of 461.3 with 391.0 when Soesdyke is expanded, and they return the cheaper route. The Parika route is also faster in time (about 8.7 hours versus 13.6 hours), so it is better whether you measure in km or hours.
 
-Why A* expanded fewer (or not fewer) nodes than UCS:
+**Why A Star expanded fewer (or not fewer) nodes than UCS:**
 
 A* expanded fewer nodes than UCS (11 versus 15) because it uses the straight-line distance to Ituni to push unpromising towns to the back of the fringe, while UCS has no idea where Ituni is. Both found the same optimal route of 456.8 km.
 
@@ -333,22 +333,152 @@ Paste the final lines of `python autograder.py --no-graphics`:
 
 ### Heuristic for the "hours" cost mode
 
-Explain the speed you divide by and why it guarantees admissibility:
+In `"hours"` mode, h(n) = (straight-line distance from n to the goal in km) ÷ v_max, where v_max is the highest average speed of any road in the network. I compute v_max as the largest value of `km / hours` over all roads in the data file. It is **71.7 km/h**, on the Soesdyke–Linden road (75.3 km in 1.05 h).
+
+**Why it is admissible:** h must never exceed the true travel time of the best route, and two facts guarantee that.
+
+1. **Distance:** the straight-line (great-circle) distance is the shortest possible distance between two points, so any real route covers at least that many km.
+2. **Speed:** no road in the network is faster than v_max, so no route can travel faster than 71.7 km/h on any leg. Ferry legs are much slower, which only makes the real time longer.
+
+So the true time on any route is at least (distance of the route) ÷ v_max, which is at least (straight-line distance) ÷ v_max = h(n). The estimate therefore never overestimates. It is also not very tight, because it assumes the whole trip is made at the fastest road speed with no ferries or detours, so A* will expand more nodes in `"hours"` mode than in `"km"` mode.
 
 ### C3.1 Results table
 
 | Start → Goal | Mode | Algorithm | Cost | Expanded | ms | Route |
-|---|---|---|---|---|---|---|
-| | | BFS | | | | |
-| | | DFS | | | | |
-| | | UCS | | | | |
-| | | Greedy | | | | |
-| | | A* | | | | |
+|:---|:---|:---|---:|---:|---:|:---|
+| Bartica → Ituni | km | BFS | 527.1 | 7 | 0.02 | Bartica → Mahdia → Linden → Ituni |
+| Bartica → Ituni | km | DFS | 558.0 | 16 | 0.02 | Bartica → Parika → Vreed en Hoop → Georgetown → Timehri → Soesdyke → Linden → Kwakwani → Ituni |
+| Bartica → Ituni | km | UCS | 456.8 | 15 | 0.03 | Bartica → Parika → Vreed en Hoop → Georgetown → Diamond → Soesdyke → Linden → Ituni |
+| Bartica → Ituni | km | Greedy | 527.1 | 3 | 0.03 | Bartica → Mahdia → Linden → Ituni |
+| Bartica → Ituni | km | A* | 456.8 | 11 | 0.04 | Bartica → Parika → Vreed en Hoop → Georgetown → Diamond → Soesdyke → Linden → Ituni |
+| Georgetown → Lethem | km | BFS | 555.6 | 20 | 0.06 | Georgetown → Diamond → Soesdyke → Linden → Kurupukari → Annai → Lethem |
+| Georgetown → Lethem | km | DFS | 573.8 | 20 | 0.02 | Georgetown → Timehri → Soesdyke → Linden → Kurupukari → Annai → Lethem |
+| Georgetown → Lethem | km | UCS | 555.6 | 20 | 0.12 | Georgetown → Diamond → Soesdyke → Linden → Kurupukari → Annai → Lethem |
+| Georgetown → Lethem | km | Greedy | 573.8 | 6 | 0.05 | Georgetown → Timehri → Soesdyke → Linden → Kurupukari → Annai → Lethem |
+| Georgetown → Lethem | km | A* | 555.6 | 16 | 0.04 | Georgetown → Diamond → Soesdyke → Linden → Kurupukari → Annai → Lethem |
+
+**Reading the table**
+
+- **Optimal:** UCS and A* return the cheapest route in both queries (456.8 km and 555.6 km). BFS is optimal only for Georgetown → Lethem, and only by luck, since it counts roads rather than kilometres.
+- **Greedy:** it expands the fewest nodes (3 and 6) but is not optimal in either query, because it follows h and ignores the cost so far. On Bartica → Ituni it picks Mahdia (h = 102.6) over Parika (h = 148.7) and ends up 70.3 km worse.
+- **A\* versus UCS:** A* expands fewer nodes at the same optimal cost (11 vs 15, and 16 vs 20), because h pushes towns that lead away from the goal to the back of the fringe.
+- **DFS:** it returns a valid route, but not a good one (558.0 km and 573.8 km), because it follows whichever branch it reaches first.
+- **Runtimes:** the times (fractions of a millisecond) are too small and noisy to compare. Use the expanded-node counts for comparing algorithms.
+
+### Q10: An admissible heuristic for both cost modes
+
+**Definition.** Let d(n) be the straight-line (haversine) distance from town n to the goal, and let v_max be the highest average speed of any road in the network, computed from the data as the maximum of km / hours over all roads. Here v_max = 71.7 km/h (Soesdyke–Linden: 75.3 km in 1.05 h).
+
+| Cost mode | h(n) |
+|:---|:---|
+| `km` | d(n) |
+| `hours` | d(n) / v_max |
+
+**Admissible.** In `km` mode, any route from n to the goal is at least as long as the straight line, since the great-circle path is the shortest possible, so h(n) ≤ h*(n). In `hours` mode, a route of length L km cannot be driven faster than v_max on any leg, so its time is at least L / v_max. Because L ≥ d(n), the true time is at least d(n) / v_max = h(n). Ferries and detours are slower than v_max, which only makes the true time larger.
+
+**Consistent.** For every road (n, n') with cost c(n, n'):
+
+- *km mode:* the triangle inequality gives d(n) ≤ d(n, n') + d(n'), and the straight line between two towns is no longer than the road between them, so d(n, n') ≤ km(n, n'). Hence h(n) ≤ c(n, n') + h(n').
+- *hours mode:* divide the same inequality by v_max. Then d(n, n') / v_max ≤ km(n, n') / v_max ≤ hours(n, n'), because the road's own speed km / hours is at most v_max. Hence h(n) ≤ c(n, n') + h(n').
+
+Consistency also gives h(goal) = 0 and admissibility, and it means A* graph search never needs to re-expand a town, so its solutions are optimal.
+
+**Non-trivial.** h(n) > 0 for every town other than the goal, so it is not zero everywhere.
+
+**Why not a tighter speed?** Using a slower speed (e.g. the average speed) could overestimate the time on the fastest roads, which would break admissibility. v_max is the largest speed that is always safe.
+
+**Limitation.** In `hours` mode the heuristic is weak, because it assumes the whole journey is made at the best road speed, with no ferries. Ferry legs are far slower (for example Parika → Anna Regina takes 5.01 h for 58.1 km), so A* may expand more nodes in `hours` mode than in `km` mode, although still no more than UCS.
+
+**Check.** I tested the heuristic on all 21 towns as goals in both modes: it never overestimated the optimal cost, satisfied the consistency inequality on every road, and A* matched UCS's cost on every start/goal pair.
 
 ### C3.2 Analysis
 
+**1. Results Table**
+
+| Start > Goal | Mode | Algorithm | Cost | Expanded | ms | Route |
+|:---|:---|:---|---:|---:|---:|:---|
+| Bartica > Ituni | km | BFS | 527.1 | 7 | 0.00 | Bartica > Mahdia > Linden > Ituni |
+| Bartica > Ituni | km | DFS | 558.0 | 16 | 0.01 | Bartica > Parika > Vreed en Hoop > Georgetown > Timehri > Soesdyke > Linden > Kwakwani > Ituni |
+| Bartica > Ituni | km | UCS | 456.8 | 15 | 0.01 | Bartica > Parika > Vreed en Hoop > Georgetown > Diamond > Soesdyke > Linden > Ituni |
+| Bartica > Ituni | km | Greedy | 527.1 | 3 | 0.01 | Bartica > Mahdia > Linden > Ituni |
+| Bartica > Ituni | km | A* | 456.8 | 11 | 0.02 | Bartica > Parika > Vreed en Hoop > Georgetown > Diamond > Soesdyke > Linden > Ituni |
+| Bartica > Ituni | hours | BFS | 13.57 | 7 | 0.00 | Bartica > Mahdia > Linden > Ituni |
+| Bartica > Ituni | hours | DFS | 11.42 | 16 | 0.01 | Bartica > Parika > Vreed en Hoop > Georgetown > Timehri > Soesdyke > Linden > Kwakwani > Ituni |
+| Bartica > Ituni | hours | UCS | 8.66 | 14 | 0.01 | Bartica > Parika > Vreed en Hoop > Georgetown > Diamond > Soesdyke > Linden > Ituni |
+| Bartica > Ituni | hours | Greedy | 13.57 | 3 | 0.01 | Bartica > Mahdia > Linden > Ituni |
+| Bartica > Ituni | hours | A* | 8.66 | 11 | 0.02 | Bartica > Parika > Vreed en Hoop > Georgetown > Diamond > Soesdyke > Linden > Ituni |
+| Georgetown > Lethem | km | BFS | 555.6 | 20 | 0.01 | Georgetown > Diamond > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | km | DFS | 573.8 | 20 | 0.01 | Georgetown > Timehri > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | km | UCS | 555.6 | 20 | 0.01 | Georgetown > Diamond > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | km | Greedy | 573.8 | 6 | 0.01 | Georgetown > Timehri > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | km | A* | 555.6 | 16 | 0.03 | Georgetown > Diamond > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | hours | BFS | 13.05 | 20 | 0.01 | Georgetown > Diamond > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | hours | DFS | 13.48 | 20 | 0.01 | Georgetown > Timehri > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | hours | UCS | 13.05 | 20 | 0.01 | Georgetown > Diamond > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | hours | Greedy | 13.48 | 6 | 0.02 | Georgetown > Timehri > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Georgetown > Lethem | hours | A* | 13.05 | 20 | 0.03 | Georgetown > Diamond > Soesdyke > Linden > Kurupukari > Annai > Lethem |
+| Charity > Corriverton | km | BFS | 322.0 | 20 | 0.01 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Ogle > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | km | DFS | 1076.5 | 15 | 0.01 | Charity > Anna Regina > Parika > Bartica > Mahdia > Linden > Soesdyke > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | km | UCS | 322.0 | 15 | 0.01 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Ogle > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | km | Greedy | 403.4 | 10 | 0.02 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Timehri > Soesdyke > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | km | A* | 322.0 | 12 | 0.02 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Ogle > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | hours | BFS | 9.52 | 20 | 0.01 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Ogle > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | hours | DFS | 26.57 | 15 | 0.01 | Charity > Anna Regina > Parika > Bartica > Mahdia > Linden > Soesdyke > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | hours | UCS | 9.52 | 13 | 0.01 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Ogle > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | hours | Greedy | 10.93 | 10 | 0.02 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Timehri > Soesdyke > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Charity > Corriverton | hours | A* | 9.52 | 12 | 0.02 | Charity > Anna Regina > Parika > Vreed en Hoop > Georgetown > Ogle > Mahaica > Rosignol > New Amsterdam > Corriverton |
+| Corriverton > Ituni | km | BFS | 362.5 | 11 | 0.01 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Ituni |
+| Corriverton > Ituni | km | DFS | 445.5 | 7 | 0.00 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Kwakwani > Ituni |
+| Corriverton > Ituni | km | UCS | 362.0 | 14 | 0.01 | Corriverton > New Amsterdam > Rosignol > Mahaica > Ogle > Diamond > Soesdyke > Linden > Ituni |
+| Corriverton > Ituni | km | Greedy | 362.5 | 6 | 0.01 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Ituni |
+| Corriverton > Ituni | km | A* | 362.0 | 11 | 0.02 | Corriverton > New Amsterdam > Rosignol > Mahaica > Ogle > Diamond > Soesdyke > Linden > Ituni |
+| Corriverton > Ituni | hours | BFS | 6.39 | 11 | 0.01 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Ituni |
+| Corriverton > Ituni | hours | DFS | 8.72 | 7 | 0.01 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Kwakwani > Ituni |
+| Corriverton > Ituni | hours | UCS | 6.39 | 12 | 0.01 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Ituni |
+| Corriverton > Ituni | hours | Greedy | 6.39 | 6 | 0.01 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Ituni |
+| Corriverton > Ituni | hours | A* | 6.39 | 12 | 0.03 | Corriverton > New Amsterdam > Rosignol > Mahaica > Soesdyke > Linden > Ituni |
+
+**2. Which algorithms were optimal, and when?** UCS and A* were optimal on all 8 queries, as expected for non-negative step costs and an admissible, consistent heuristic. BFS was optimal on 5 of 8 (Georgetown → Lethem in both modes, Charity → Corriverton in both modes, and Corriverton → Ituni in hours). It is only optimal by luck, when the route with the fewest roads happens to be the cheapest: BFS counts roads, not kilometres or hours. DFS was never optimal and can be very bad (1076.5 km versus 322.0 km on Charity → Corriverton, because it wandered through Bartica and Mahdia).
+
+**When did greedy search fail, and why?** Greedy was optimal on only 1 of 8 queries (Corriverton → Ituni in hours). It ranks towns by h(n) alone and ignores the cost already spent, so it follows towns that look close on the map but are reached by long roads.
+- *Bartica → Ituni:* from Bartica it picks Mahdia (h = 102.6 km) over Parika (h = 148.7 km). The Mahdia route costs 527.1 km versus 456.8 km (15% worse), and 13.57 h versus 8.66 h (57% worse), because both Mahdia roads are very long ferry or road legs.
+- *Georgetown → Lethem:* it picks the direct Georgetown → Timehri road (43.8 km), which looks closer to Lethem, rather than going via Diamond (13.0 + 21.1 km to Soesdyke). The result is 18.2 km worse (573.8 versus 555.6).
+- *Charity → Corriverton:* it reaches Mahaica via Timehri and Soesdyke (121.4 km) instead of via Ogle (40.0 km), which costs 81.4 km extra (403.4 versus 322.0).
+
+Straight-line distance cannot see that a town which looks closer may only be reachable by a long road.
+
+**How much did the heuristic reduce expansions for A\* compared with UCS?**
+
+| Query | UCS | A* | Reduction |
+|:---|---:|---:|---:|
+| Bartica → Ituni, km | 15 | 11 | 27% |
+| Bartica → Ituni, hours | 14 | 11 | 21% |
+| Georgetown → Lethem, km | 20 | 16 | 20% |
+| Georgetown → Lethem, hours | 20 | 20 | 0% |
+| Charity → Corriverton, km | 15 | 12 | 20% |
+| Charity → Corriverton, hours | 13 | 12 | 8% |
+| Corriverton → Ituni, km | 14 | 11 | 21% |
+| Corriverton → Ituni, hours | 12 | 12 | 0% |
+
+A* never expanded more nodes than UCS. In `km` mode it saved about 20–27%. In `hours` mode the saving was much smaller (0–21%). The reason is that h = straight-line distance ÷ v_max, with v_max = 71.7 km/h, assumes the whole trip is driven at the fastest road speed. Real routes include slow ferries (for example Parika–Anna Regina: 58.1 km in 5.01 h, about 12 km/h), so h underestimates by a large factor and gets close to a zero heuristic, which makes A* behave like UCS.
+
+**Did the best route change between `km` and `hours`?** Yes, but not because of ferries. On Corriverton → Ituni the best route in km goes Mahaica → Ogle → Diamond → Soesdyke (68.6 km, 362.0 km total), but in hours it takes the direct Mahaica → Soesdyke road (69.1 km but 1.20 h instead of 1.43 h), giving 6.39 h. The direct road is 0.5 km longer but 0.23 h faster. Georgetown → Timehri behaves the same way (direct road is faster but longer than the route via Diamond and Soesdyke). For the ferry routes, the best route was the same in both modes:
+- Bartica reaches the coast either by the single Bartica–Parika ferry (235.2 km, 4.53 h) or by two ferries via Mahdia (461.3 km to Linden, 11.9 h), so the Parika route wins in both km and hours.
+- Charity and Lethem are only reachable through one ferry each (Parika–Anna Regina and Kurupukari–Annai), so no alternative exists.
+
+Ferries do change the *size* of the numbers, though. Charity → Corriverton is 322.0 km but takes 9.52 h, an average of only 34 km/h, because the 5.01 h ferry accounts for more than half of the time.
+
+**Runtime.** All runs finished in under 0.03 ms, so differences are tiny and partly timer noise. Even so, A* was consistently the slowest (0.02–0.03 ms) even though it expanded fewer nodes than UCS (0.01 ms). The reason is that A* calls the heuristic for every successor, and each call computes a haversine distance (several trig functions), while UCS only adds numbers. On this 21-town map, the saving in expansions is too small to pay for the more expensive work per node. A* would only win on runtime on a much larger map, or with a heuristic that is cheaper to compute. This is why nodes expanded, not milliseconds, is the more reliable measure for comparing the algorithms here.
+
+
 ### C3.3 Formulation critique
 
+Two things real travel in Guyana depends on that this model ignores:
+
+1. **Ferry schedules and waiting time.** The model treats a ferry as a road with a fixed time, as if one is always waiting at the dock. In reality ferries run at certain times, so a traveller may wait for hours.
+2. **Rainy-season road conditions** (for example the Linden–Lethem road surface). The model uses one fixed travel time per road, but in the rainy season some roads are slow or impassable.
+
+**Changing the model for ferry schedules.** Make time part of the state. A state becomes (town, time of day), for example in 15-minute slots. Actions become "drive or board the ferry to a neighbour" and "wait 15 minutes". The step cost of a ferry road becomes the wait until the next departure plus the crossing time, and ordinary roads keep their normal time. The size of the search space grows from |S| = 21 towns to about 21 × T states. With 96 slots per day that is 2,016 states, and about 4,032 for a two-day horizon. The branching factor also grows by one because of the "wait" action. The straight-line heuristic stays admissible, since waiting can only make the true time longer, but A* will expand more nodes because h now ignores waiting entirely. For the rainy-season issue, the state space would stay the same size and only the costs would change (a season parameter would multiply the time on affected roads).
 ---
 
 ## Part D: Search vs. LLMs
