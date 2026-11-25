@@ -329,6 +329,20 @@ The saving is only 4 nodes because straight-line distance can't see the road lay
 Paste the final lines of `python autograder.py --no-graphics`:
 
 ```
+Provisional grades
+==================
+Question q1: 3/3 
+Question q2: 3/3 
+Question q3: 3/3 
+Question q4: 3/3 
+Question q5: 3/3 
+Question q6: 3/3 
+Question q7: 5/4 
+Question q8: 3/3 
+Question q9: 4/4 
+Question q10: 4/4 
+------------------
+Total: 34/33
 ```
 
 ### Heuristic for the "hours" cost mode
@@ -478,7 +492,9 @@ Two things real travel in Guyana depends on that this model ignores:
 1. **Ferry schedules and waiting time.** The model treats a ferry as a road with a fixed time, as if one is always waiting at the dock. In reality ferries run at certain times, so a traveller may wait for hours.
 2. **Rainy-season road conditions** (for example the Linden–Lethem road surface). The model uses one fixed travel time per road, but in the rainy season some roads are slow or impassable.
 
-**Changing the model for ferry schedules.** Make time part of the state. A state becomes (town, time of day), for example in 15-minute slots. Actions become "drive or board the ferry to a neighbour" and "wait 15 minutes". The step cost of a ferry road becomes the wait until the next departure plus the crossing time, and ordinary roads keep their normal time. The size of the search space grows from |S| = 21 towns to about 21 × T states. With 96 slots per day that is 2,016 states, and about 4,032 for a two-day horizon. The branching factor also grows by one because of the "wait" action. The straight-line heuristic stays admissible, since waiting can only make the true time longer, but A* will expand more nodes because h now ignores waiting entirely. For the rainy-season issue, the state space would stay the same size and only the costs would change (a season parameter would multiply the time on affected roads).
+**Changing the model for ferry schedules.**
+Make time part of the state. A state becomes (town, time of day), for example in 15-minute slots. Actions become "drive or board the ferry to a neighbour" and "wait 15 minutes". The step cost of a ferry road becomes the wait until the next departure plus the crossing time, and ordinary roads keep their normal time. The size of the search space grows from |S| = 21 towns to about 21 × T states. With 96 slots per day that is 2,016 states, and about 4,032 for a two-day horizon. The branching factor also grows by one because of the "wait" action. The straight-line heuristic stays admissible, since waiting can only make the true time longer, but A* will expand more nodes because h now ignores waiting entirely. For the rainy-season issue, the state space would stay the same size and only the costs would change (a season parameter would multiply the time on affected roads).
+
 ---
 
 ## Part D: Search vs. LLMs
@@ -487,6 +503,29 @@ Two things real travel in Guyana depends on that this model ignores:
 
 For each instance: model and version, exact prompt, full response.
 
+**All 3 Queries were Aggregated  into one Plot**
+![alt text](src/nodes_expanded_all.png)
+
+**Model:** Copilot(Auto)  **Version**: 158.0.4370.33
+
+
+**Prompt:** With data given, use BFS, DFS, UCS, Greedy Search and, A star algorithms to find best routes from Bartica to Ituni, Georgetown to Lethem, Charity to Corriverton and, Corriverton to Ituni. Display your results on a bar chart showing amount of nodes expanded.
+
+**Response:**
+Using the road network from guyana_roads, I compared BFS, DFS, Uniform Cost Search (UCS), Greedy Best-First Search, and A* for the four requested origin-destination pairs. Straight-line distance derived from the town coordinates was used as the heuristic for Greedy Search and A*.
+
+![alt text](image.png)
+
+**Observations**
+
+Greedy Best-First Search expanded the fewest nodes in all four cases because it aggressively follows the heuristic toward the goal.
+BFS generally expanded the most nodes because it explores broadly level-by-level without considering distance.
+UCS often expanded a similar or larger number of nodes than BFS because it guarantees least-cost routes based on road distance.
+A* reduced expansions compared with UCS in most cases by combining path cost and heuristic guidance.
+DFS sometimes performed well in terms of node expansions, but its performance depends heavily on the order in which neighbors are explored and does not guarantee an optimal route.
+
+The chart visualizes the relative search effort (measured as nodes expanded) for each algorithm across the four route-finding problems.
+
 #### Instance 1
 
 #### Instance 2
@@ -494,6 +533,288 @@ For each instance: model and version, exact prompt, full response.
 #### Instance 3
 
 #### Instance 4 (8-puzzle)
+A random puzzle:
+
+| 1 | 6 | 2 |
+
+| 3 | 4 |   |
+
+| 7 | 8 | 5 |
+
+BFS found a path of 11 moves: ['down', 'left', 'up', 'up', 'left', 'down', 'right', 'down', 'left', 'up', 'up']
+After 1 move: down
+
+| 1 | 6 | 2 |
+
+| 3 | 4 | 5 |
+
+| 7 | 8 |   |
+
+Press return for the next state...
+After 2 moves: left
+
+| 1 | 6 | 2 |
+
+| 3 | 4 | 5 |
+
+| 7 |   | 8 |
+
+Press return for the next state...
+After 3 moves: up
+
+| 1 | 6 | 2 |
+
+| 3 |   | 5 |
+
+| 7 | 4 | 8 |
+
+Press return for the next state...
+After 4 moves: up
+
+| 1 |   | 2 |
+
+| 3 | 6 | 5 |
+
+| 7 | 4 | 8 |
+
+Press return for the next state...
+After 5 moves: left
+
+|   | 1 | 2 |
+
+| 3 | 6 | 5 |
+
+| 7 | 4 | 8 |
+
+Press return for the next state...
+After 6 moves: down
+
+| 3 | 1 | 2 |
+
+|   | 6 | 5 |
+
+| 7 | 4 | 8 |
+
+Press return for the next state...
+After 7 moves: right
+
+| 3 | 1 | 2 |
+
+| 6 |   | 5 |
+
+| 7 | 4 | 8 |
+
+Press return for the next state...
+After 8 moves: down
+
+| 3 | 1 | 2 |
+
+| 6 | 4 | 5 |
+
+| 7 |   | 8 |
+
+Press return for the next state...
+After 9 moves: left
+
+| 3 | 1 | 2 |
+
+| 6 | 4 | 5 |
+
+|   | 7 | 8 |
+
+Press return for the next state...
+After 10 moves: 
+
+| 3 | 1 | 2 |
+
+|   | 4 | 5 |
+
+| 6 | 7 | 8 |
+
+Press return for the next state...
+After 11 moves: up
+
+|   | 1 | 2 |
+
+| 3 | 4 | 5 |
+
+| 6 | 7 | 8 |
+
+Press return for the next state...
+
+**LLM Instance**
+
+**Model:** Copilot(Auto)  **Version**: 158.0.4370.33
+
+
+**Prompt:** A random puzzle:
+
+| 1 | 6 | 2 |
+
+| 3 | 4 |   |
+
+| 7 | 8 | 5 |
+
+Find the solution to this 8puzzle using BFS algorithm, show the moves made and amount.
+
+**Response:**
+
+Assume the goal state is the standard 8-puzzle goal:
+
+1 2 3
+4 5 6
+7 8 _
+
+
+Initial state:
+
+1 6 2
+3 4 _
+7 8 5
+
+
+Before solving, we check whether the puzzle is solvable.
+
+Step 1: Count Inversions
+
+Ignoring the blank, the sequence is:
+
+1, 6, 2, 3, 4, 7, 8, 5
+
+
+Inversions:
+
+6 > 2, 3, 4, 5 → 4 inversions
+7 > 5 → 1 inversion
+8 > 5 → 1 inversion
+
+Total inversions = 6
+
+For a 3×3 puzzle (odd width), a state is solvable if the number of inversions is even.
+
+Since 6 is even, the puzzle is solvable.
+
+BFS Solution
+
+Using Breadth-First Search, the shortest solution found is:
+
+Move #	Move
+1	Down
+2	Left
+3	Up
+4	Left
+5	Down
+6	Right
+7	Up
+8	Right
+9	Down
+
+## State Sequence
+
+ **Initial State**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 3 | 4 | _ |
+| 7 | 8 | 5 |
+
+**Move 1: Down**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 3 | 4 | 5 |
+| 7 | 8 | _ |
+
+**Move 2: Left**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 3 | 4 | 5 |
+| 7 | _ | 8 |
+
+**Move 3: Up**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 3 | _ | 5 |
+| 7 | 4 | 8 |
+
+**Move 4: Left**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| _ | 3 | 5 |
+| 7 | 4 | 8 |
+
+**Move 5: Down**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 7 | 3 | 5 |
+| _ | 4 | 8 |
+
+**Move 6: Right**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 7 | 3 | 5 |
+| 4 | _ | 8 |
+
+**Move 7: Up**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 7 | _ | 5 |
+| 4 | 3 | 8 |
+
+**Move 8: Right**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 7 | 5 | _ |
+| 4 | 3 | 8 |
+
+**Move 9: Down**
+
+|   |   |   |
+|---|---|---|
+| 1 | 6 | 2 |
+| 7 | 5 | 8 |
+| 4 | 3 | _ |
+
+**Move Sequence**
+
+`Down → Left → Up → Left → Down → Right → Up → Right → Down`
+
+**Total Moves**
+
+`9 moves`
+
+
+At this point BFS would continue searching because this is not yet the standard goal state.
+
+**Important Observation**
+
+The configuration you provided is solvable, but a complete BFS search is required to determine the exact minimum-length path to the standard goal configuration. The sequence above illustrates the first valid level-expanding moves, but not necessarily the final optimal solution.
+
+For a homework or AI assignment, BFS statistics are typically reported as:
+
+Initial state: 1 6 2 / 3 4 _ / 7 8 5
+Goal state: 1 2 3 / 4 5 6 / 7 8 _
+Solvable: Yes
+Search strategy: Breadth-First Search
+Minimum number of moves: requires full state-space BFS computation
+
+If you'd like, I can also compute the complete optimal BFS solution path, number of nodes expanded, frontier size, and search tree depth for this puzzle.
 
 #### Instance 5 (8-puzzle)
 
